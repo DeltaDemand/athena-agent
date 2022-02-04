@@ -1,8 +1,8 @@
 package sampler
 
 import (
-	Global "github.com/DeltaDemand/athena-agent/Global"
 	appConfigs "github.com/DeltaDemand/athena-agent/configs"
+	"github.com/DeltaDemand/athena-agent/global"
 	"github.com/DeltaDemand/athena-agent/internal/client"
 	pb "github.com/EZ4BRUCE/athena-proto/proto"
 	"github.com/shirou/gopsutil/mem"
@@ -25,10 +25,10 @@ func SendMemPercent(config appConfigs.MemConfs) {
 		}
 		if timeNow%config.ReportInterval == 0 && samplingMemTimes != 0 {
 			client.RequestToServer(pb.ReportReq{
-				UId:        Global.GetUId(),
+				UId:        global.GetUId(),
 				Timestamp:  timeNow,
-				Metric:     Global.MEM_RATE,
-				Dimensions: map[string]string{LOCAL_IP: Global.GetIP()},
+				Metric:     global.MEM_RATE,
+				Dimensions: map[string]string{LOCAL_IP: global.GetIP()},
 				Value:      everySamplingMem / float64(samplingMemTimes),
 			})
 			everySamplingMem = 0.0

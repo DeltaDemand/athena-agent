@@ -6,7 +6,6 @@ require (
 	github.com/EZ4BRUCE/athena-proto v0.0.0-20220204053844-8a6fffbdf612
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	google.golang.org/grpc v1.44.0
-
 )
 
 require (

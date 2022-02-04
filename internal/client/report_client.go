@@ -2,8 +2,8 @@ package client
 
 import (
 	"context"
-	Global "github.com/DeltaDemand/athena-agent/Global"
 	appConfigs "github.com/DeltaDemand/athena-agent/configs"
+	"github.com/DeltaDemand/athena-agent/global"
 	pb "github.com/EZ4BRUCE/athena-proto/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -41,14 +41,14 @@ func Register() {
 
 	resp, err := client.Register(context.Background(), &pb.RegisterReq{
 		Timestamp:   time.Now().Unix(),
-		Metrics:     Global.Metrics,
-		Description: Global.GetIP(),
+		Metrics:     global.Metrics,
+		Description: global.GetIP(),
 	})
 	if err != nil {
 		log.Println("Register失败，或服务器返回UID失败")
 	}
 	log.Printf("client.Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
-	Global.SetUId(resp.UId)
+	global.SetUId(resp.UId)
 	clientPool.Put(client)
 }
 

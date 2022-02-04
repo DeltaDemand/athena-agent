@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/DeltaDemand/athena-agent/Global"
 	appConfigs "github.com/DeltaDemand/athena-agent/configs"
+	"github.com/DeltaDemand/athena-agent/global"
 	"github.com/DeltaDemand/athena-agent/internal/client"
 	"github.com/DeltaDemand/athena-agent/internal/inputArgs"
 	"github.com/DeltaDemand/athena-agent/internal/sampler"
