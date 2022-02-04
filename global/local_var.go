@@ -39,7 +39,6 @@ func initIP() (err error) {
 	localAddr := conn.LocalAddr().String()
 	idx := strings.LastIndex(localAddr, ":")
 	ip = localAddr[0:idx]
-	println(ip)
 	return nil
 }
 
