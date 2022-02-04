@@ -1,0 +1,25 @@
+{
+    "Agent": {
+    },
+    "ReportServer":{
+        "ip":"127.0.0.1",
+        "port": "8888"
+    },
+    "CpuSampling": {
+        "run": true,
+        "samplingInterval": 1,
+        "reportInterval": 60
+    },
+    "MemSampling": {
+        "run": true,
+        "samplingInterval": 1,
+        "reportInterval": 60
+    },
+    "DiskSampling": {
+        "run": true,
+        "samplingInterval": 1,
+        "reportInterval": 60
+    }
+}
+
+
