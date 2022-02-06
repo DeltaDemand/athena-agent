@@ -2,12 +2,11 @@
     "Agent": {
     },
     "ReportServer":{
-        "ip":"athena-server",
+        "ip":"localhost",
         "port": "8888"
     },
     "CpuSampling": {
         "run": true,
-        "samplingInterval": 1,
         "reportInterval": 60
     },
     "MemSampling": {

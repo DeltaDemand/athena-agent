@@ -7,7 +7,6 @@ import (
 	pb "github.com/EZ4BRUCE/athena-proto/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 	"sync"
 	"time"
 )
@@ -30,7 +29,7 @@ func ConnectGRPC(confs appConfigs.Config) {
 	var err error
 	conn, err = grpc.Dial(confs.ReportServer.GetAddress(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("连接 gPRC 服务失败,", err)
+		global.Logger.Fatal("连接 gPRC 服务失败,dial的server端是：", confs.ReportServer.GetAddress(), err)
 	}
 }
 
@@ -41,13 +40,13 @@ func Register() {
 
 	resp, err := client.Register(context.Background(), &pb.RegisterReq{
 		Timestamp:   time.Now().Unix(),
-		Metrics:     global.Metrics,
+		Metrics:     global.RunMetricsName,
 		Description: global.GetIP(),
 	})
 	if err != nil {
-		log.Println("Register失败，或服务器返回UID失败")
+		global.Logger.Fatal("Register失败，服务器返回UID失败...", err)
 	}
-	log.Printf("client.Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
+	global.Logger.Printf("client.Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
 	global.SetUId(resp.UId)
 	clientPool.Put(client)
 }
@@ -56,9 +55,9 @@ func RequestToServer(req pb.ReportReq) *pb.ReportRsp {
 	client := clientPool.Get().(pb.ReportServerClient)
 	rep, err := client.Report(context.TODO(), &req)
 	if err != nil {
-		log.Fatal("gPRC服务发送信息失败\n", err)
+		global.Logger.Fatal("gPRC服务发送信息失败\n", err)
 	}
-	log.Printf("client.Register resp{code: %d, message: %s}\n", rep.Code, rep.Msg)
+	global.Logger.Printf("client.Register resp{code: %d, message: %s}\n", rep.Code, rep.Msg)
 	clientPool.Put(client)
 	return rep
 }
@@ -66,6 +65,6 @@ func CloseConn() {
 	clientPool.New()
 	err := conn.Close()
 	if err != nil {
-		log.Fatal(err)
+		global.Logger.Fatal(err)
 	}
 }
