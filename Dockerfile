@@ -25,4 +25,4 @@ WORKDIR /go/src/athena-agent
 # 把/go/src/athena-agent 整个文件夹的文件到当前工作目录
 COPY --from=0 /go/src/athena-agent ./
 
-ENTRYPOINT ./athena-agent 
+ENTRYPOINT ./athena-agent $0 $@

@@ -26,35 +26,25 @@ func (s *diskSample) Execute(wg *sync.WaitGroup) {
 }
 
 func sendDiskPercent(config appConfigs.DiskConfs) {
-	if config.Run && config.SamplingInterval > config.ReportInterval {
-		global.Logger.Println("disk的采样间隔大于上报间隔，自动修改采样间隔等于上报间隔")
-		config.SamplingInterval = config.ReportInterval
-	}
-	samplingInterval := int64(0)
+
 	for config.Run {
 		timeNow := time.Now().Unix()
-		if samplingInterval == 0 {
+
+		if timeNow%config.ReportInterval == 0 {
 			parts, _ := disk.Partitions(true)
 			diskInfo, err := disk.Usage(parts[0].Mountpoint)
 			if err == nil {
-				everySamplingMem += diskInfo.UsedPercent
-				samplingMemTimes++
+				client.RequestToServer(pb.ReportReq{
+					UId:        global.GetUId(),
+					Timestamp:  timeNow,
+					Metric:     global.DiskUsed,
+					Dimensions: map[string]string{LocalIp: global.GetIP()},
+					Value:      diskInfo.UsedPercent,
+				})
+			} else {
+				global.Logger.Println("获取硬盘数据失败")
 			}
-			samplingInterval = config.SamplingInterval
 		}
-
-		if timeNow%config.ReportInterval == 0 && samplingMemTimes != 0 {
-			client.RequestToServer(pb.ReportReq{
-				UId:        global.GetUId(),
-				Timestamp:  timeNow,
-				Metric:     global.DiskUsed,
-				Dimensions: map[string]string{LocalIp: global.GetIP()},
-				Value:      everySamplingMem / float64(samplingMemTimes),
-			})
-			everySamplingMem = 0.0
-			samplingMemTimes = 0
-		}
-		samplingInterval--
 		time.Sleep(time.Second)
 	}
 }
