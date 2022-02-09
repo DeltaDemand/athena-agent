@@ -2,7 +2,7 @@
     "Agent": {
     },
     "ReportServer":{
-        "ip":"athena-server",
+        "ip":"112.74.60.132",
         "port": "8888"
     },
     "CpuSampling": {

@@ -19,6 +19,10 @@ RUN go generate && go env && go build -o athena-agent .
 
 FROM alpine:latest
 
+RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone \
+    && apk del tzdata
+
 LABEL MAINTAINER="2390647320@qq.com"
 WORKDIR /go/src/athena-agent
 

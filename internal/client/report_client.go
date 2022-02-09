@@ -57,7 +57,7 @@ func RequestToServer(req pb.ReportReq) *pb.ReportRsp {
 	if err != nil {
 		global.Logger.Fatal("gPRC服务发送信息失败\n", err)
 	}
-	global.Logger.Printf("client.Register resp{code: %d, message: %s}\n", rep.Code, rep.Msg)
+	global.Logger.Printf("client.Request resp{code: %d, message: %s}\n", rep.Code, rep.Msg)
 	clientPool.Put(client)
 	return rep
 }
