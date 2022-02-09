@@ -6,6 +6,7 @@ import (
 	"github.com/DeltaDemand/athena-agent/internal/client"
 	pb "github.com/EZ4BRUCE/athena-proto/proto"
 	"github.com/shirou/gopsutil/disk"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -38,7 +39,7 @@ func sendDiskPercent(config appConfigs.DiskConfs) {
 					UId:        global.GetUId(),
 					Timestamp:  timeNow,
 					Metric:     global.DiskUsed,
-					Dimensions: map[string]string{LocalIp: global.GetIP()},
+					Dimensions: map[string]string{LocalIp: global.GetIP(), "diskTotal": strconv.FormatUint(diskInfo.Total, 10)},
 					Value:      diskInfo.UsedPercent,
 				})
 			} else {

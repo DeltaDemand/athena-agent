@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ip  = "0.0.0.0"
-	uId string
+	ip         = "0.0.0.0"
+	uId        string
+	CheckAlive int
 )
 
 func SetUId(id string) {

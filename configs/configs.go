@@ -7,10 +7,12 @@ import (
 )
 
 type Config struct {
+	AgentConfi   AgentConfs   `json:"Agent"`
 	ReportServer ReportServer `json:"ReportServer"`
 	CpuConfi     CpuConfs     `json:"CpuSampling"`
 	MemConfi     MemConfs     `json:"MemSampling"`
 	DiskConfi    DiskConfs    `json:"DiskSampling"`
+	CpuMemConfi  CpuMemConfs  `json:"CpuMem"`
 }
 
 var config = Config{}

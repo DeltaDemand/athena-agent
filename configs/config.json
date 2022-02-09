@@ -1,5 +1,6 @@
 {
     "Agent": {
+        "checkAlive":120
     },
     "ReportServer":{
         "ip":"athena-server",
@@ -17,6 +18,13 @@
     "DiskSampling": {
         "run": true,
         "reportInterval": 60
+    },
+    "CpuMem": {
+        "run": true,
+        "samplingInterval": 1,
+        "reportInterval": 60,
+        "cpuPercentThreshold": 50.0,
+        "memPercentThreshold": 80.0
     }
 }
 

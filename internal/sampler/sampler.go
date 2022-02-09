@@ -12,12 +12,18 @@ type Sampler interface {
 }
 
 var (
-	cpuSampler  = cpuSample{}
-	memSampler  = memSample{}
-	diskSampler = diskSample{}
+	cpuSampler    = cpuSample{}
+	memSampler    = memSample{}
+	diskSampler   = diskSample{}
+	cpuMemSampler = cpuMemSample{}
 )
 
 func Init(config appConfigs.Config) {
+	setSamplerConf(&config)
+	setGlobalRunMetrics()
+}
+
+func setSamplerConf(config *appConfigs.Config) {
 	if config.CpuConfi.Run {
 		cpuSampler.name = global.CpuRate
 		cpuSampler.config = config.CpuConfi
@@ -33,9 +39,13 @@ func Init(config appConfigs.Config) {
 		diskSampler.config = config.DiskConfi
 		global.RunMetrics = append(global.RunMetrics, &diskSampler)
 	}
-
-	setGlobalRunMetrics()
+	if config.CpuMemConfi.Run {
+		cpuMemSampler.name = global.CpuMem
+		cpuMemSampler.config = config.CpuMemConfi
+		global.RunMetrics = append(global.RunMetrics, &cpuMemSampler)
+	}
 }
+
 func setGlobalRunMetrics() {
 	global.RunMetricsNum = len(global.RunMetrics)
 	global.RunMetricsName = make([]string, global.RunMetricsNum)

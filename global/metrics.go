@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	MetricsNum = 3 //总指标数
+	MetricsNum = 4 //总指标数
 	CpuRate    = "cpu_rate"
 	MemUsed    = "memory_used"
 	DiskUsed   = "disk_used"
+	CpuMem     = "cpu_mem"
 )
 
 var (

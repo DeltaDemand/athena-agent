@@ -39,9 +39,10 @@ func Register() {
 	client := clientPool.Get().(pb.ReportServerClient)
 
 	resp, err := client.Register(context.Background(), &pb.RegisterReq{
-		Timestamp:   time.Now().Unix(),
-		Metrics:     global.RunMetricsName,
-		Description: global.GetIP(),
+		Timestamp:      time.Now().Unix(),
+		Metrics:        global.RunMetricsName,
+		CheckAliveTime: int32(global.CheckAlive),
+		Description:    global.GetIP(),
 	})
 	if err != nil {
 		global.Logger.Fatal("Register失败，服务器返回UID失败...", err)

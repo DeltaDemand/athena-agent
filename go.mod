@@ -3,8 +3,7 @@ module github.com/DeltaDemand/athena-agent
 go 1.17
 
 require (
-
-	github.com/EZ4BRUCE/athena-proto v0.0.0-20220204053844-8a6fffbdf612
+	github.com/EZ4BRUCE/athena-proto v0.0.0-20220209031520-52cfd3e1d38a
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	google.golang.org/grpc v1.44.0
 )
