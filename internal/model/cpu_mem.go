@@ -1,5 +1,6 @@
-package appConfigs
+package model
 
+//cpu_mem配置接收结构体
 type CpuMemConfs struct {
 	Run                 bool    `json:"run"`
 	SamplingInterval    int64   `json:"samplingInterval"`

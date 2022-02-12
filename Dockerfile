@@ -5,7 +5,7 @@ LABEL MAINTAINER="2390647320@qq.com"
 ENV GO111MODULE=on \
     GOPROXY=https://goproxy.cn,direct
 
-# 移动到工作目录：/build
+# 移动到工作目录
 WORKDIR /go/src/athena-agent
 # 将代码复制到容器中
 COPY . .
@@ -19,6 +19,7 @@ RUN go generate && go env && go build -o athena-agent .
 
 FROM alpine:latest
 
+#设置容器时区为上海
 RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "Asia/Shanghai" > /etc/timezone \
     && apk del tzdata

@@ -1,5 +1,6 @@
-package appConfigs
+package model
 
+//memory_used配置接收结构体
 type MemConfs struct {
 	Run              bool  `json:"run"`
 	SamplingInterval int64 `json:"samplingInterval"`

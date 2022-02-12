@@ -1,71 +1,75 @@
+//实现pb协议的客户端函数
+
 package client
 
 import (
 	"context"
-	appConfigs "github.com/DeltaDemand/athena-agent/configs"
 	"github.com/DeltaDemand/athena-agent/global"
 	pb "github.com/EZ4BRUCE/athena-proto/proto"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"sync"
 	"time"
 )
 
 var (
-	conn       *grpc.ClientConn
-	clientPool = &sync.Pool{
-		New: func() interface{} {
-			// 创建 gRPC 客户端
-			return pb.NewReportServerClient(conn)
-		},
-	}
+	// 保证正在调用client时,不会突然改变连接参数
+	// 保证改变参数重连时，不会有goroutine调用client
+	connSafe sync.RWMutex
 )
 
-type RegisterError struct {
-	Msg string
-}
+const (
+	notFoundCode = 10000001
+	sqlErr       = 10000002
+)
 
-func ConnectGRPC(confs appConfigs.Config) {
-	var err error
-	conn, err = grpc.Dial(confs.ReportServer.GetAddress(), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		global.Logger.Fatal("连接 gPRC 服务失败,dial的server端是：", confs.ReportServer.GetAddress(), err)
-	}
-}
-
-//注册并获取Uid,设置成全局变量
-func Register() {
-	//获取一个client结构体
+// Register 注册到ReportServer并获取Uid,设置成全局变量
+func Register() error {
+	//加读锁，防止获取client对象时被重新连接（ConnectGRPC函数）修改clientPool
+	connSafe.RLock()
+	//获取一个pb.ReportServerClient结构体
 	client := clientPool.Get().(pb.ReportServerClient)
-
+	defer clientPool.Put(client)
+	//调用pb的注册函数
 	resp, err := client.Register(context.Background(), &pb.RegisterReq{
-		Timestamp:      time.Now().Unix(),
-		Metrics:        global.RunMetricsName,
-		CheckAliveTime: int32(global.CheckAlive),
-		Description:    global.GetIP(),
+		Timestamp:       time.Now().Unix(),
+		Metrics:         global.MetricsName,
+		CheckAliveTime:  int32(global.CheckAlive),
+		AggregationTime: int32(global.AggregationTime),
+		Description:     "agent group: " + global.AgentGroup + "; name: " + global.AgentName + "; ip: " + global.GetIP(),
 	})
+	connSafe.RUnlock()
 	if err != nil {
-		global.Logger.Fatal("Register失败，服务器返回UID失败...", err)
+		global.Logger.Printf("Register失败，服务器返回UID失败,Agent暂停。\n", err)
+		//注册失败，先暂停Agent
+		global.SetPause(true)
+		return err
 	}
 	global.Logger.Printf("client.Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
 	global.SetUId(resp.UId)
-	clientPool.Put(client)
+	return nil
 }
 
-func RequestToServer(req pb.ReportReq) *pb.ReportRsp {
+// RequestToServer 封装处理pb的Report函数
+func RequestToServer(req pb.ReportReq) (*pb.ReportRsp, error) {
+	//加读锁，防止获取client对象时被重新连接（ConnectGRPC函数）修改clientPool
+	connSafe.RLock()
 	client := clientPool.Get().(pb.ReportServerClient)
-	rep, err := client.Report(context.TODO(), &req)
+	defer clientPool.Put(client)
+	//调用pb的报告函数
+	rep, err := client.Report(context.Background(), &req)
+	connSafe.RUnlock()
 	if err != nil {
-		global.Logger.Fatal("gPRC服务发送信息失败\n", err)
+		global.Logger.Printf("gPRC服务发送信息失败\n", err)
+		//处理发送直接返回
+		return nil, err
 	}
 	global.Logger.Printf("client.Request resp{code: %d, message: %s}\n", rep.Code, rep.Msg)
-	clientPool.Put(client)
-	return rep
-}
-func CloseConn() {
-	clientPool.New()
-	err := conn.Close()
-	if err != nil {
-		global.Logger.Fatal(err)
+	//ReportServer找不到本机uid，重新注册
+	if rep.Code == notFoundCode {
+		//再次注册
+		Register()
+	} else if rep.Code == sqlErr {
+		//返回数据库错误，暂停Agent
+		global.SetPause(true)
 	}
+	return rep, nil
 }

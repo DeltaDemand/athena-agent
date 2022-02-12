@@ -12,20 +12,30 @@ import (
 var wg = sync.WaitGroup{}
 
 func main() {
+	//加载configs/config.json下配置
+	confs := appConfigs.LoadingConfigs()
+	//检测用户输入配置
+	inputArgs.Parse(&confs)
 
-	confs := appConfigs.LoadingConfigs() //加载configs/config.json下配置
-	inputArgs.Parse(&confs)              //检测用户输入配置
+	//指标和对应的采样器初始化，添加到global.RunMetrics中去
+	confs.InitGlobalMetrics()
 
-	sampler.Init(confs) //采样器初始化，需要运行的添加到global.RunMetrics中去
+	//监听Etcd，查看是否变化
+	confs.StartWatchEtcd(&wg)
 
-	client.ConnectGRPC(confs) //连接服务器
-	defer client.CloseConn()
-	global.InitVar()  //初始化本机的全局变量（IP）
-	client.Register() //注册本机到服务器
+	//连接ReportServer
+	confs.ReportServer.ConnectGRPC()
+	defer confs.ReportServer.CloseConn()
 
-	wg.Add(global.RunMetricsNum)
-	for _, metric := range global.RunMetrics {
-		go metric.(sampler.Sampler).Execute(&wg)
+	//初始化本机的一些全局变量（IP）
+	global.InitVar()
+	//注册本机到服务器
+	client.Register()
+
+	//每个指标都启动它的采样器
+	for _, metric := range global.Metrics {
+		metric.(sampler.Sampler).Execute(&wg)
 	}
+
 	wg.Wait()
 }

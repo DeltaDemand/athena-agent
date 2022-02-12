@@ -1,25 +1,33 @@
 {
     "Agent": {
-        "checkAlive":120
+        "group": "athena",
+        "name": "agent",
+        "checkAlive":120,
+        "pause": false
     },
     "ReportServer":{
         "ip":"athena-server",
         "port": "8888"
     },
-    "CpuSampling": {
-        "run": true,
-        "reportInterval": 60
+    "Etcd": {
+        "apply": true,
+        "endPoints": ["112.74.60.132:2379","localhost:2379"],
+        "dialTimeout": 5
     },
-    "MemSampling": {
+    "cpu_rate": {
+    "run": true,
+    "reportInterval": 60
+    },
+    "memory_used": {
         "run": true,
         "samplingInterval": 1,
         "reportInterval": 60
     },
-    "DiskSampling": {
+    "disk_used": {
         "run": true,
         "reportInterval": 60
     },
-    "CpuMem": {
+    "cpu_mem": {
         "run": true,
         "samplingInterval": 1,
         "reportInterval": 60,
