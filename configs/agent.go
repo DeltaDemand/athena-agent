@@ -8,11 +8,9 @@ import (
 
 //本agent的一些参数
 type AgentConfs struct {
-	Group      string `json:"group"`
-	Name       string `json:"name"`
-	CheckAlive int    `json:"checkAlive"` //给ReportServer的检查本agent存活的时间阈值
-	Pause      bool   `json:"pause"`
-	Exit       bool   `json:"exit"`
+	CheckAlive int  `json:"checkAlive"` //给ReportServer的检查本agent存活的时间阈值
+	Pause      bool `json:"pause"`
+	Exit       bool `json:"exit"`
 }
 
 //agent配置改变执行函数
@@ -22,8 +20,6 @@ func (agent *AgentConfs) Execute(wg *sync.WaitGroup) error {
 		global.Logger.Fatal("Agent退出...")
 	}
 	global.SetPause(agent.Pause)
-	global.AgentGroup = agent.Group
-	global.AgentName = agent.Name
 	//如果读到非暂停，将暂停的采样器执行起来
 	if !global.GetPause() {
 		for _, metric := range global.Metrics {

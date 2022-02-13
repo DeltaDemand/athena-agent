@@ -7,15 +7,20 @@ import (
 )
 
 var (
-	ip              string
-	uId             string
-	CheckAlive      int
-	exit            bool
-	pause           bool
-	AgentGroup      string
-	AgentName       string
-	AggregationTime int64
-	agentStatLock   sync.RWMutex //只允许一个goroutine修改Agent状态(暂停)
+	ip         string
+	uId        string //本Agent唯一id
+	CheckAlive int    //本Agent可能最长多长时间不上报
+	pause      bool   //本Agent暂停状态
+
+	exit       bool   //退出，仅可通过etcd设置
+	AgentGroup string //本Agent所属etcd群
+	AgentName  string ////本Agent在etcd上的名称
+
+	EtcdChange          = make(chan bool, 1) //etcd有变，开始监听etcd
+	HandleChangeSuccess bool                 //etcd变化处理成功标识
+	AggregationTime     int64                //上报几次进行聚合
+	agentStatLock       sync.RWMutex         //只允许一个goroutine修改Agent状态(暂停)
+	Split               = "(}"               //用于监控etcd连接 AgentGroup、AgentName、配置项的字符串
 )
 
 // SetPause 设置Agent暂停状态，可能会有多个goroutine同时访问，加锁
@@ -59,4 +64,5 @@ func initIP() (err error) {
 
 func InitVar() {
 	initIP()
+	EtcdChange <- true
 }

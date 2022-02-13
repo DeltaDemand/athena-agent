@@ -9,11 +9,11 @@ import (
 
 // Parse :Agent命令行参数解析
 func Parse(confs *appConfigs.Config) {
-	flag.StringVar(&confs.AgentConfi.Group, "group", confs.AgentConfi.Group, "Agent分组")
-	flag.StringVar(&confs.AgentConfi.Name, "name", confs.AgentConfi.Name, "Agent名字")
+	flag.StringVar(&confs.Etcd.AgentGroup, "group", confs.Etcd.AgentGroup, "etcd上Agent分组")
+	flag.StringVar(&confs.Etcd.AgentName, "name", confs.Etcd.AgentName, "etcd上Agent名字")
 
 	flag.IntVar(&confs.AgentConfi.CheckAlive, "checkAlive", confs.AgentConfi.CheckAlive, "检测是否存活时间间隔")
-	flag.Int64Var(&global.AggregationTime, "aggregationTime", 0, "建议聚合时间，默认0(由server端决定)")
+	flag.Int64Var(&global.AggregationTime, "aggregationTime", 0, "上报几次进行聚合，默认0(由server端决定)")
 	flag.StringVar(&confs.ReportServer.Ip, "ip", confs.ReportServer.Ip, "监控服务器ip地址")
 	flag.StringVar(&confs.ReportServer.Port, "p", confs.ReportServer.Port, "监控服务器监听端口号")
 
@@ -38,6 +38,6 @@ func Parse(confs *appConfigs.Config) {
 	//初始化全局变量值
 	confs.Etcd.EndPoints = strings.Split(ends, ",")
 	global.CheckAlive = confs.AgentConfi.CheckAlive
-	global.AgentGroup = confs.AgentConfi.Group
-	global.AgentName = confs.AgentConfi.Name
+	global.AgentGroup = confs.Etcd.AgentGroup
+	global.AgentName = confs.Etcd.AgentName
 }

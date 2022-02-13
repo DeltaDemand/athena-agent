@@ -1,7 +1,5 @@
 {
     "Agent": {
-        "group": "athena",
-        "name": "agent",
         "checkAlive":120,
         "pause": false
     },
@@ -11,6 +9,8 @@
     },
     "Etcd": {
         "apply": true,
+        "agent_group": "Athena",
+        "agent_name": "Agent01",
         "endPoints": ["112.74.60.132:2379","localhost:2379"],
         "dialTimeout": 5
     },
@@ -35,5 +35,3 @@
         "memPercentThreshold": 80.0
     }
 }
-
-

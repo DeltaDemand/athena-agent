@@ -15,6 +15,10 @@ RUN go mod tidy
 # go env 查看go的环境变量
 # go build -o athena-agent . 打包项目生成文件名为athena-agent的二进制文件
 RUN go generate && go env && go build -o athena-agent .
+# 移动到工作目录
+WORKDIR /go/src/athena-agent/test
+RUN go mod tidy
+RUN go generate && go env && go build -o testCpu .
 
 
 FROM alpine:latest
