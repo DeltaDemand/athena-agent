@@ -12,7 +12,7 @@ var wg = sync.WaitGroup{}
 func main() {
 	n := flag.Int("n", 100, "创造死循环个数")
 	t := flag.Int("t", 90, "死循环时间(s)")
-	sl := flag.Int("s", 0, "睡眠时间(ns)")
+	sl := flag.Int("s", 0, "每次循环内睡眠时间(ns)")
 	flag.Parse()
 	println(*n, "个goroutine，开始跑cpu: ", *t, "s")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(*t))
