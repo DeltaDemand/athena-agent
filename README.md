@@ -12,7 +12,7 @@ git clone https://github.com/DeltaDemand/athena-agent.git
 #进入athena-agent目录
 cd athena-agent
 #构建docker镜像
-docker build -m=200*1024*1024 -t athena-agent .
+docker build -t athena-agent .
 
 #本机测试：使用docker内网
 docker run -d -i --name host01 --network athena_frontend athena-agent -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10
