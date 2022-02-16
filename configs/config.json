@@ -9,9 +9,10 @@
     },
     "Etcd": {
         "apply": true,
-        "agent_group": "Athena",
-        "agent_name": "Agent01",
-        "endPoints": ["112.74.60.132:2379","localhost:2379"],
+        "config_server": "config-s01",
+        "agent_group": "g01",
+        "agent_name": "A01",
+        "endPoints": ["112.74.60.132:2379"],
         "dialTimeout": 5
     },
     "cpu_rate": {

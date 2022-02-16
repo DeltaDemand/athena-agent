@@ -38,9 +38,11 @@ func Register() error {
 	})
 	connSafe.RUnlock()
 	if err != nil {
-		global.Logger.Printf("Register失败，服务器返回UID失败,Agent暂停。\n", err)
+		global.Logger.Printf("Register失败，服务器返回UID失败,Agent暂停...\n", err)
 		//注册失败，先暂停Agent
 		global.SetPause(true)
+		//把Agent状态更新configServer上的状态
+		RefreshAgentState(true)
 		return err
 	}
 	global.Logger.Printf("client.Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
@@ -70,6 +72,8 @@ func RequestToServer(req pb.ReportReq) (*pb.ReportRsp, error) {
 	} else if rep.Code == sqlErr {
 		//返回数据库错误，暂停Agent
 		global.SetPause(true)
+		//把Agent状态更新configServer上的状态
+		RefreshAgentState(true)
 	}
 	return rep, nil
 }

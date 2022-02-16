@@ -32,6 +32,8 @@ func (r *ReportServer) ConnectGRPC() error {
 		global.Logger.Println("连接gPRC服务失败,Agent暂停,可通过etcd更新Agent参数pause重新启动;  dial的server端是：", r.GetAddr(), err)
 		//gRPC连接失败，Agent暂停
 		global.SetPause(true)
+		//把Agent状态更新configServer上的状态
+		RefreshAgentState(true)
 		return err
 	}
 	//连接成功就初始化pb.ReportServerClient池

@@ -9,6 +9,7 @@ import (
 
 // Parse :Agent命令行参数解析
 func Parse(confs *appConfigs.Config) {
+	flag.StringVar(&confs.Etcd.ConfigServer, "ConfigServer", confs.Etcd.ConfigServer, "本Agent需连接的etcd上的修改配置的服务")
 	flag.StringVar(&confs.Etcd.AgentGroup, "group", confs.Etcd.AgentGroup, "etcd上Agent分组")
 	flag.StringVar(&confs.Etcd.AgentName, "name", confs.Etcd.AgentName, "etcd上Agent名字")
 
@@ -32,11 +33,12 @@ func Parse(confs *appConfigs.Config) {
 
 	var ends string
 	flag.BoolVar(&confs.Etcd.Apply, "etcd", true, "是否连接etcd")
-	flag.StringVar(&ends, "endPoints", "112.74.60.132:2379,localhost:2379", "etcd节点的地址可以多个，用逗号(,)隔开")
+	flag.StringVar(&ends, "endPoints", "112.74.60.132:2379", "etcd节点的地址可以多个，用逗号(,)隔开")
 
 	flag.Parse()
 	//初始化全局变量值
 	confs.Etcd.EndPoints = strings.Split(ends, ",")
+	global.ConfigServer = confs.Etcd.ConfigServer
 	global.CheckAlive = confs.AgentConfi.CheckAlive
 	global.AgentGroup = confs.Etcd.AgentGroup
 	global.AgentName = confs.Etcd.AgentName

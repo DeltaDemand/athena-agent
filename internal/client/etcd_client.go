@@ -5,16 +5,18 @@ import (
 	"encoding/json"
 	"github.com/DeltaDemand/athena-agent/global"
 	"go.etcd.io/etcd/client/v3"
+	"strconv"
 	"sync"
 	"time"
 )
 
 type Etcd struct {
-	AgentGroup  string   `json:"agent_group"`
-	AgentName   string   `json:"agent_name"`
-	Apply       bool     `json:"apply"`
-	EndPoints   []string `json:"endPoints"`
-	DialTimeout int      `json:"dialTimeout"`
+	ConfigServer string   `json:"config_server"`
+	AgentGroup   string   `json:"agent_group"`
+	AgentName    string   `json:"agent_name"`
+	Apply        bool     `json:"apply"`
+	EndPoints    []string `json:"endPoints"`
+	DialTimeout  int      `json:"dialTimeout"`
 }
 
 var (
@@ -38,14 +40,20 @@ func (e *Etcd) Connect() error {
 
 // WatchConfig
 //参数  ConfigChangeExecuter表示该配置更新是否要执行事件，nil表示不用
-func (e *Etcd) WatchConfig(key string, configs interface{}, obj ConfigChangeExecuter, wg *sync.WaitGroup) {
+func (e *Etcd) WatchConfig(configName string, configs interface{}, obj ConfigChangeExecuter, wg *sync.WaitGroup) {
 	wg.Add(1)
+	//要监听的配置作为key
+	key := e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split + configName
+	//先上传一份配置到etcd服务器，相当于注册
+	value, _ := json.Marshal(configs)
+	//etcd没有就阻塞，不会往下运行，节约资源
+	cli.Put(context.TODO(), key, string(value))
 	go func() {
-		watchCh := cli.Watch(context.TODO(), key+global.Split+e.AgentGroup+global.Split+e.AgentName)
+		watchCh := cli.Watch(context.TODO(), key)
 		for res := range watchCh {
 			value := res.Events[0].Kv.Value
 			if err := json.Unmarshal(value, configs); err != nil {
-				global.Logger.Println(key, " watchConfig err", err)
+				global.Logger.Println(configName, " watchConfig err", err)
 				continue
 			}
 			//该配置改变需要执行事件
@@ -53,14 +61,14 @@ func (e *Etcd) WatchConfig(key string, configs interface{}, obj ConfigChangeExec
 				err := obj.Execute(wg)
 				//执行失败
 				if err != nil {
-					global.Logger.Printf("%s Configs change to %#v, fail to Execute", key, configs)
+					global.Logger.Printf("%s Configs change to %#v, fail to Execute", configName, configs)
 				} else {
 					//执行成功
-					global.Logger.Printf("%s Configs change to %#v,change Execute", key, configs)
+					global.Logger.Printf("%s Configs change to %#v,change Execute", configName, configs)
 				}
 			} else {
 				//不需要执行事件直接打印结构体
-				global.Logger.Printf("%s Configs change to %#v", key, configs)
+				global.Logger.Printf("%s Configs change to %#v", configName, configs)
 			}
 		}
 		wg.Done()
@@ -93,6 +101,19 @@ func (e *Etcd) Execute(wg *sync.WaitGroup) error {
 		time.Sleep(time.Second)
 	}
 	return nil
+}
+
+//把Agent状态更新到etcd服务器
+func RefreshAgentState(pause bool) {
+	key := global.ConfigServer + global.Split + global.AgentGroup + global.Split + global.AgentName + global.Split + global.Agent
+	//根据Agent状态更新configServer上的状态
+	if pause {
+		//etcd没有开启就阻塞，不会往下运行，节约资源
+		cli.Put(context.TODO(), key, "{\"checkAlive\":"+strconv.Itoa(global.CheckAlive)+",\"pause\":true,\"exit\":false}")
+	} else {
+		cli.Put(context.TODO(), key, "{\"checkAlive\":"+strconv.Itoa(global.CheckAlive)+",\"pause\":false,\"exit\":false}")
+	}
+	global.Logger.Println(key)
 }
 
 func (e *Etcd) CloseConn() {

@@ -1,10 +1,5 @@
 package global
 
-import (
-	"log"
-	"os"
-)
-
 //不变的三个配置项
 const (
 	Agent        = "Agent"
@@ -22,5 +17,4 @@ const (
 var (
 	Metrics     = make(map[string]interface{}, MetricsNum) //K:指标名称 V:采样器（Sampler）
 	MetricsName []string
-	Logger      = log.New(os.Stdout, "<Agent>", log.Lshortfile|log.Ldate|log.Ltime)
 )
