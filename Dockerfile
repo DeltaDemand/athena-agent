@@ -18,7 +18,7 @@ RUN go generate && go env && go build -o athena-agent .
 # 移动到工作目录
 WORKDIR /go/src/athena-agent/test
 RUN go mod tidy
-RUN go generate && go env && go build -o testCpu .
+RUN go generate && go env && go build -o poseidon .
 
 
 FROM alpine:latest
