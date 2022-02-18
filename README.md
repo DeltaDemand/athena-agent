@@ -1,11 +1,12 @@
 ### Agent部署
 
-####拉取并构建镜像[Agent端](https://github.com/DeltaDemand/athena-agent)
+####  拉取并构建镜像[Agent端](https://github.com/DeltaDemand/athena-agent)
 ```bash
 #构建docker镜像
 docker build -t athena-agent https://github.com/DeltaDemand/athena-agent.git#main
 ```
-####启动镜像
+#### 启动镜像
+
 ```bash
 #本机测试：使用docker内网
 docker run -d -i --name host01 --network athena_frontend athena-agent -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10
@@ -16,21 +17,28 @@ docker run -d -i --name host01 --network athena_frontend athena-agent -aggregati
 docker run -d --name host01 athena-agent -ip="112.74.60.132" -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10 -group=group01 -name=agent01
 #腾讯云
 docker run -d --name host01 athena-agent -ip="1.12.242.39" -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10 -group=group01 -name=agent01
-# athena-agent 参数解释
+# athena-agent 部分参数解释:
+# -aggregationTime int                                                      
+#        上报几次进行聚合，默认0(由server端决定)
+# -checkAlive int                                                           
+#        检测是否存活时间间隔 (default 120) 
+# -ip string
+#        监控服务器ip地址 (default "athena-server")
+# -cpuR int
+#        cpu上报时间间隔 (default 60)
 # -group string
 #        etcd上Agent分组 (default "g01")
 # -name string
 #        etcd上Agent名字 (default "A01")
-# -cpuR int
-#        cpu上报时间间隔 (default 60)
 ````
-####告警测试：
+#### 告警测试：
+
 ```bash
 #进入agent终端
 docker exec -it host01 /bin/sh
 #运行程序，使cpu、内存等数据有所波动
 ./test/poseidon -goN=12 -append=10000000 -sleep=100000
-# poseidon参数解释
+# poseidon参数解释:
 # -append int                                 
 #        每个goroutine内append字符串的次数     
 #  -goN int                                    
