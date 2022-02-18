@@ -16,7 +16,7 @@ var (
 
 func main() {
 	n := flag.Int("goN", 10, "创造goroutine跑死循环个数")
-	t := flag.Int("times", 90, "死循环时间(s)")
+	t := flag.Int("time", 90, "死循环时间(s)")
 	flag.IntVar(&sle, "sleep", 0, "每次循环睡眠时间(ns)")
 	flag.IntVar(&len, "append", 0, "每个goroutine内append字符串的次数")
 	flag.Parse()

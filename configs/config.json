@@ -32,7 +32,7 @@
         "run": true,
         "samplingInterval": 1,
         "reportInterval": 60,
-        "cpuPercentThreshold": 50.0,
-        "memPercentThreshold": 80.0
+        "cpuPercentThreshold": 70.0,
+        "memPercentThreshold": 50.0
     }
 }
