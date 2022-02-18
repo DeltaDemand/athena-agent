@@ -2,6 +2,7 @@ package appConfigs
 
 import (
 	"github.com/DeltaDemand/athena-agent/global"
+	"github.com/DeltaDemand/athena-agent/internal/client"
 	"github.com/DeltaDemand/athena-agent/internal/sampler"
 	"sync"
 )
@@ -22,8 +23,15 @@ func (agent *AgentConfs) Execute(wg *sync.WaitGroup) error {
 	global.SetPause(agent.Pause)
 	//如果读到非暂停，将暂停的采样器执行起来
 	if !global.GetPause() {
-		for _, metric := range global.Metrics {
-			metric.(sampler.Sampler).Execute(wg)
+		//如果注册成功
+		if global.GetRegisterSuccess() {
+			for _, metric := range global.Metrics {
+				metric.(sampler.Sampler).Execute(wg)
+			}
+		} else {
+			//将云端状态重设为false
+			client.RefreshAgentState(true)
+			global.Logger.Println("Agent未注册成功，请检查ReportServer设置..")
 		}
 	} else {
 		//agent暂停

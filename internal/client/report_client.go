@@ -39,12 +39,16 @@ func Register() error {
 	connSafe.RUnlock()
 	if err != nil {
 		global.Logger.Printf("Register失败，服务器返回UID失败,Agent暂停...\n", err)
+		//注册失败，注册状态设为失败
+		global.SetRegisterSuccess(false)
 		//注册失败，先暂停Agent
 		global.SetPause(true)
 		//把Agent状态更新configServer上的状态
 		RefreshAgentState(true)
 		return err
 	}
+	//注册失败，注册状态设为成功
+	global.SetRegisterSuccess(true)
 	global.Logger.Printf("client.Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
 	global.SetUId(resp.UId)
 	return nil

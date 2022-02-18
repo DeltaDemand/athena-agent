@@ -9,10 +9,13 @@ import (
 )
 
 var (
-	ip         string
-	uId        string //本Agent唯一id
-	CheckAlive int    //本Agent可能最长多长时间不上报
-	pause      bool   //本Agent暂停状态
+	ip    string
+	uId   string //本Agent唯一id
+	Split = "(]" //用于监控etcd连接 AgentGroup、AgentName、配置项的字符串
+
+	CheckAlive      int  //本Agent可能最长多长时间不上报
+	pause           bool //本Agent暂停状态
+	registerSuccess bool //本机注册成功
 
 	exit         bool   //退出，仅可通过etcd设置
 	ConfigServer string //本Agent需连接的etcd上的修改配置的服务
@@ -23,15 +26,14 @@ var (
 	HandleChangeSuccess bool                 //etcd变化处理成功标识
 	AggregationTime     int64                //上报几次进行聚合
 	agentStatLock       sync.RWMutex         //只允许一个goroutine修改Agent状态(暂停)
-	Split               = "(]"               //用于监控etcd连接 AgentGroup、AgentName、配置项的字符串
 
 	Logger = log.New(os.Stdout, "<Agent>", log.Lshortfile|log.Ldate|log.Ltime)
 )
 
 // SetPause 设置Agent暂停状态，可能会有多个goroutine同时访问，加锁
-func SetPause(p bool) {
+func SetPause(statPause bool) {
 	agentStatLock.Lock()
-	pause = p
+	pause = statPause
 	agentStatLock.Unlock()
 }
 
@@ -40,6 +42,18 @@ func GetPause() bool {
 	agentStatLock.RLock()
 	defer agentStatLock.RUnlock()
 	return pause
+}
+
+//GetRegisterSuccess 设置Agent连接注册状态
+func SetRegisterSuccess(success bool) {
+	registerSuccess = success
+}
+
+// GetRegisterSuccess 读取Agent连接注册状态
+func GetRegisterSuccess() bool {
+	agentStatLock.RLock()
+	defer agentStatLock.RUnlock()
+	return registerSuccess
 }
 
 //只在Register中使用

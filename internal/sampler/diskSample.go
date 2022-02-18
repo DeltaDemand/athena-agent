@@ -30,8 +30,8 @@ func (s *DiskSample) GetConfigPtr() interface{} {
 	return &s.Config
 }
 func (s *DiskSample) Execute(wg *sync.WaitGroup) error {
-	//agent暂停或已经有实例在跑就不执行
-	if !global.GetPause() && s.running == false {
+	//agent暂停或注册没成功或已经有实例在跑就不执行
+	if !global.GetPause() && global.GetRegisterSuccess() && s.running == false {
 		wg.Add(1)
 		//设置该采样器在运行的状态
 		s.running = true
