@@ -27,7 +27,7 @@ func (agent *AgentConfs) Execute(wg *sync.WaitGroup) error {
 		}
 	} else {
 		//agent暂停
-		global.Logger.Println("Agent暂停...")
+		global.Logger.Println("Agent在配置服务器上已改为暂停状态")
 	}
 	return nil
 }

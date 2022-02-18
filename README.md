@@ -35,9 +35,12 @@ docker run -d --name host01 athena-agent -ip="1.12.242.39" -aggregationTime=5 -c
 
 ```bash
 #进入agent终端
-docker exec -it host01 /bin/sh
+docker exec -it host1 /bin/sh
 #运行程序，使cpu、内存等数据有所波动
-./test/poseidon -goN=12 -append=10000000 -sleep=100000
+#以下函数测试能让内存跑80%左右，如主机内存过小请降低append数量。
+./test/poseidon -goN=12 -append=2000000 -sleep=100000
+#以下函数测试能让cpu跑80%左右，如主机过热请增大sleep时间。
+./test/poseidon   -sleep=10
 # poseidon参数解释:
 # -append int                                 
 #        每个goroutine内append字符串的次数     

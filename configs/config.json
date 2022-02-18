@@ -16,8 +16,9 @@
         "dialTimeout": 5
     },
     "cpu_rate": {
-    "run": true,
-    "reportInterval": 60
+        "run": true,
+        "samplingInterval": 1,
+        "reportInterval": 60
     },
     "memory_used": {
         "run": true,

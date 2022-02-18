@@ -113,7 +113,6 @@ func RefreshAgentState(pause bool) {
 	} else {
 		cli.Put(context.TODO(), key, "{\"checkAlive\":"+strconv.Itoa(global.CheckAlive)+",\"pause\":false,\"exit\":false}")
 	}
-	global.Logger.Println(key)
 }
 
 func (e *Etcd) CloseConn() {

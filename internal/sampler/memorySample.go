@@ -57,7 +57,6 @@ func (s *MemSample) sendMemPercent() {
 	samplingInterval := int64(0)
 	//循环判断agent是否停止，或该指标是否启动
 	for !global.GetPause() && s.Config.Run {
-		timeNow := time.Now().Unix()
 		if samplingInterval == 0 {
 			//采集时间间隔到了，采集数据
 			memInfo, err := mem.VirtualMemory()
@@ -68,6 +67,7 @@ func (s *MemSample) sendMemPercent() {
 			//采集完数据，重置采集时间间隔
 			samplingInterval = s.Config.SamplingInterval
 		}
+		timeNow := time.Now().Unix()
 		//整点发送数据
 		if timeNow%s.Config.ReportInterval == 0 && samplingTimes != 0 {
 			memInfo, _ := mem.VirtualMemory()

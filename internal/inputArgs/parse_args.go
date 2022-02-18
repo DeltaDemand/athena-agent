@@ -29,6 +29,7 @@ func Parse(confs *appConfigs.Config) {
 	flag.Int64Var(&confs.CpuMemConfi.ReportInterval, "cpu_memR", confs.CpuMemConfi.ReportInterval, "cpu_mem上报时间间隔")
 
 	flag.Int64Var(&confs.MemConfi.SamplingInterval, "memS", confs.MemConfi.SamplingInterval, "mem采样时间间隔")
+	flag.Int64Var(&confs.CpuMemConfi.SamplingInterval, "cpuS", confs.CpuMemConfi.SamplingInterval, "cpu采样时间间隔")
 	flag.Int64Var(&confs.CpuMemConfi.SamplingInterval, "cpu_memS", confs.CpuMemConfi.SamplingInterval, "cpu_mem采样时间间隔")
 
 	var ends string
