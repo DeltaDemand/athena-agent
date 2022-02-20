@@ -9,23 +9,23 @@ import (
 )
 
 var (
-	ip    string
-	uId   string //本Agent唯一id
-	Split = "(]" //用于监控etcd连接 AgentGroup、AgentName、配置项的字符串
+	ip              string
+	uId             string //本Agent唯一id
+	Split           = "(]" //用于监控etcd连接 AgentGroup、AgentName、配置项的字符串
+	CheckAlive      int    //本Agent可能最长多长时间不上报
+	AggregationTime int64  //上报几次进行聚合
 
-	CheckAlive      int  //本Agent可能最长多长时间不上报
-	pause           bool //本Agent暂停状态
-	registerSuccess bool //本机注册成功
+	pause           bool         //本Agent暂停状态
+	registerSuccess bool         //本机注册成功
+	exit            bool         //退出，仅可通过etcd设置
+	agentStatLock   sync.RWMutex //只允许一个goroutine修改Agent状态(暂停)
 
-	exit         bool   //退出，仅可通过etcd设置
 	ConfigServer string //本Agent需连接的etcd上的修改配置的服务
 	AgentGroup   string //本Agent所属etcd上的群组
 	AgentName    string ////本Agent在etcd上的名称
 
 	EtcdChange          = make(chan bool, 1) //etcd有变，开始监听etcd
 	HandleChangeSuccess bool                 //etcd变化处理成功标识
-	AggregationTime     int64                //上报几次进行聚合
-	agentStatLock       sync.RWMutex         //只允许一个goroutine修改Agent状态(暂停)
 
 	Logger = log.New(os.Stdout, "<Agent>", log.Lshortfile|log.Ldate|log.Ltime)
 )

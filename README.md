@@ -9,14 +9,14 @@ docker build -t athena-agent https://github.com/DeltaDemand/athena-agent.git#mai
 
 ```bash
 #本机测试：使用docker内网
-docker run -d -i --name host01 --network athena_frontend athena-agent -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10
+docker run -d -i --name host-test --network athena_frontend athena-agent -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10
 ```
 ```bash
 #agent运行连接云服务器
 #阿里云
-docker run -d --name host01 athena-agent -ip="112.74.60.132" -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10 -group=group01 -name=agent01
+docker run -d --name host-test athena-agent -ip="112.74.60.132" -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10 -group=group01 -name=agent01
 #腾讯云
-docker run -d --name host01 athena-agent -ip="1.12.242.39" -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10 -group=group01 -name=agent01
+docker run -d --name host-test athena-agent -ip="1.12.242.39" -aggregationTime=5 -checkAlive=30 -cpuR=10 -memR=10 -diskR=10 -cpu_memR=10 -group=group01 -name=agent01
 # athena-agent 部分参数解释:
 # -aggregationTime int                                                      
 #        上报几次进行聚合，默认0(由server端决定)
@@ -35,12 +35,12 @@ docker run -d --name host01 athena-agent -ip="1.12.242.39" -aggregationTime=5 -c
 
 ```bash
 #进入agent终端
-docker exec -it host1 /bin/sh
+docker exec -it host-test /bin/sh
 #运行程序，使cpu、内存等数据有所波动
 #以下函数测试能让内存跑80%左右，如主机内存过小请降低append数量。
 ./test/poseidon -goN=12 -append=2000000 -sleep=100000
-#以下函数测试能让cpu跑80%左右，如主机过热请增大sleep时间。
-./test/poseidon   -sleep=10
+#以下函数测试能让cpu跑90%以上，如主机过热请增大sleep时间。
+./test/poseidon   -sleep=0 -goN=12  -time=60
 # poseidon参数解释:
 # -append int                                 
 #        每个goroutine内append字符串的次数     
