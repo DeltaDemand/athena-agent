@@ -38,16 +38,36 @@ func (e *Etcd) Connect() error {
 	return nil
 }
 
+//检查etcd上是否正常连接，且不存在同名Agent
+func (e *Etcd) CheckConfigServer() bool {
+	global.Logger.Printf("正在连接etcd...")
+	key := e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split
+	response, err := cli.Get(context.TODO(), key, clientv3.WithPrefix())
+	//检查etcd上是否正常连接
+	if err != nil {
+		global.Logger.Println("连接etcd出错", err.Error())
+	}
+	global.Logger.Printf("连接etcd成功")
+	//存在同名Agent
+	if response.Count != 0 {
+		return true
+	}
+	return false
+}
+
 // WatchConfig
 //参数  ConfigChangeExecuter表示该配置更新是否要执行事件，nil表示不用
-func (e *Etcd) WatchConfig(configName string, configs interface{}, obj ConfigChangeExecuter, wg *sync.WaitGroup) {
+func (e *Etcd) WatchConfig(exist bool, configName string, configs interface{}, obj ConfigChangeExecuter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	//要监听的配置作为key
 	key := e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split + configName
-	//先上传一份配置到etcd服务器，相当于注册
-	value, _ := json.Marshal(configs)
-	//etcd没有就阻塞，不会往下运行，节约资源
-	cli.Put(context.TODO(), key, string(value))
+	if !exist {
+		//服务器不存在该agent配置。
+		//先上传一份配置到etcd服务器，相当于注册
+		value, _ := json.Marshal(configs)
+		//etcd没有就阻塞，不会往下运行，节约资源
+		cli.Put(context.TODO(), key, string(value))
+	}
 	go func() {
 		watchCh := cli.Watch(context.TODO(), key)
 		for res := range watchCh {

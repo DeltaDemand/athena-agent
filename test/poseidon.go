@@ -34,18 +34,17 @@ func main() {
 //循环体
 func cycle(ctx context.Context) {
 	defer wg.Done()
+	for i := 0; i < len; i++ {
+		a = append(a, "testMemory")
+	}
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
-			for i := 0; i < len; i++ {
-				a = append(a, "testMemory")
-			}
 			if sle > 0 {
 				time.Sleep(time.Duration(sle))
 			}
 		}
 	}
-
 }

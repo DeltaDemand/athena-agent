@@ -71,12 +71,12 @@ func (s *CpuSample) sendCpuPercent() {
 		timeNow := time.Now().Unix()
 		//整点发送数据
 		if timeNow%s.Config.ReportInterval == 0 && samplingTimes != 0 {
-			physicalCores, _ := cpu.Counts(false)
+			logicalCores, _ := cpu.Counts(true)
 			client.RequestToServer(pb.ReportReq{
 				UId:        global.GetUId(),
 				Timestamp:  timeNow,
 				Metric:     s.name,
-				Dimensions: map[string]string{LocalIp: global.GetIP(), "physicalCores": strconv.Itoa(physicalCores)},
+				Dimensions: map[string]string{LocalIp: global.GetIP(), "physicalCores": strconv.Itoa(logicalCores)},
 				Value:      samplingResult / float64(samplingTimes),
 			})
 			samplingResult = 0.0

@@ -31,14 +31,24 @@ docker run -d --name host-test athena-agent -ip="1.12.242.39" -aggregationTime=5
 # -name string
 #        etcd上Agent名字 (default "A01")
 ````
-#### 告警测试：
+### 告警测试：
 
 ```bash
 #进入agent终端
 docker exec -it host-test /bin/sh
-#运行程序，使cpu、内存等数据有所波动
-#以下函数测试能让内存跑80%左右，如主机内存过小请降低append数量。
-./test/poseidon -goN=12 -append=2000000 -sleep=100000
+```
+#### 运行程序，使cpu、内存等数据有所波动
+goN=12情况下改变append值能让内存占用大致如下，可根据机器内存大小来调整测试。
+
+200000--->150M
+
+2000000--->917M
+
+3000000->1.4G
+
+4000000->2.0G
+```bash
+./test/poseidon -goN=12 -append=2000000 -sleep=10
 #以下函数测试能让cpu跑90%以上，如主机过热请增大sleep时间。
 ./test/poseidon   -sleep=0 -goN=12  -time=60
 # poseidon参数解释:

@@ -38,7 +38,7 @@ func Register() error {
 	})
 	connSafe.RUnlock()
 	if err != nil {
-		global.Logger.Printf("Register失败，服务器返回UID失败,Agent暂停...\n", err)
+		global.Logger.Printf("Register失败，服务器返回UID失败,Agent暂停...\n", err.Error())
 		//注册失败，注册状态设为失败
 		global.SetRegisterSuccess(false)
 		//注册失败，先暂停Agent

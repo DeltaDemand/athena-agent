@@ -9,9 +9,6 @@ import (
 
 // Parse :Agent命令行参数解析
 func Parse(confs *appConfigs.Config) {
-	flag.StringVar(&confs.Etcd.ConfigServer, "ConfigServer", confs.Etcd.ConfigServer, "本Agent需连接的etcd上的修改配置的服务")
-	flag.StringVar(&confs.Etcd.AgentGroup, "group", confs.Etcd.AgentGroup, "etcd上Agent分组")
-	flag.StringVar(&confs.Etcd.AgentName, "name", confs.Etcd.AgentName, "etcd上Agent名字")
 
 	flag.IntVar(&confs.AgentConfi.CheckAlive, "checkAlive", confs.AgentConfi.CheckAlive, "检测是否存活时间间隔")
 	flag.Int64Var(&global.AggregationTime, "aggregationTime", 0, "上报几次进行聚合，默认0(由server端决定)")
@@ -32,8 +29,11 @@ func Parse(confs *appConfigs.Config) {
 	flag.Int64Var(&confs.CpuMemConfi.SamplingInterval, "cpuS", confs.CpuMemConfi.SamplingInterval, "cpu采样时间间隔")
 	flag.Int64Var(&confs.CpuMemConfi.SamplingInterval, "cpu_memS", confs.CpuMemConfi.SamplingInterval, "cpu_mem采样时间间隔")
 
+	flag.StringVar(&confs.Etcd.ConfigServer, "ConfigServer", confs.Etcd.ConfigServer, "本Agent需连接的etcd上的修改配置的服务")
+	flag.StringVar(&confs.Etcd.AgentGroup, "group", confs.Etcd.AgentGroup, "etcd上Agent分组")
+	flag.StringVar(&confs.Etcd.AgentName, "name", confs.Etcd.AgentName, "etcd上Agent名字")
 	var ends string
-	flag.BoolVar(&confs.Etcd.Apply, "etcd", true, "是否连接etcd")
+	flag.BoolVar(&confs.Etcd.Apply, "etcd", confs.Etcd.Apply, "是否连接etcd")
 	flag.StringVar(&ends, "endPoints", "112.74.60.132:2379", "etcd节点的地址可以多个，用逗号(,)隔开")
 
 	flag.Parse()
