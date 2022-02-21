@@ -48,7 +48,7 @@ goN=12情况下改变append值能让内存占用大致如下，可根据机器�
 
 4000000->2.0G
 ```bash
-./test/poseidon -goN=12 -append=2000000 -sleep=10
+./test/poseidon -goN=12 -append=2000000 -sleep=100000000
 #以下函数测试能让cpu跑90%以上，如主机过热请增大sleep时间。
 ./test/poseidon   -sleep=0 -goN=12  -time=60
 # poseidon参数解释:
