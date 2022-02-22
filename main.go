@@ -46,7 +46,7 @@ func main() {
 
 func exitHandle() {
 	exitChan := make(chan os.Signal)
-	//监听退出得信号
+	//监听退出的信号
 	signal.Notify(exitChan, os.Interrupt, os.Kill, syscall.SIGTERM)
 	for {
 		select {
