@@ -43,8 +43,10 @@ func main() {
 	wg.Wait()
 	global.Logger.Println("无采样器在运行，Agent退出...")
 }
+
 func exitHandle() {
 	exitChan := make(chan os.Signal)
+	//监听退出得信号
 	signal.Notify(exitChan, os.Interrupt, os.Kill, syscall.SIGTERM)
 	for {
 		select {

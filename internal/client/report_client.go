@@ -49,7 +49,7 @@ func Register() error {
 	}
 	//注册失败，注册状态设为成功
 	global.SetRegisterSuccess(true)
-	global.Logger.Printf("client.Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
+	global.Logger.Printf("Register resp{code: %d, Uid:%s, message: %s}\n", resp.Code, resp.UId, resp.Msg)
 	global.SetUId(resp.UId)
 	return nil
 }
@@ -68,7 +68,7 @@ func RequestToServer(req pb.ReportReq) (*pb.ReportRsp, error) {
 		//处理发送直接返回
 		return nil, err
 	}
-	global.Logger.Printf("client.Request resp{code: %d, message: %s}\n", rep.Code, rep.Msg)
+	global.Logger.Printf("Metric: [%s],Value:[%f],\t Request resp  {code: %d, message: %s}\n", req.Metric, req.Value, rep.Code, rep.Msg)
 	//ReportServer找不到本机uid，重新注册
 	if rep.Code == notFoundCode {
 		//再次注册

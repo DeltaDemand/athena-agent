@@ -30,7 +30,9 @@ func (c *Config) StartWatchEtcd(wg *sync.WaitGroup) {
 		_ = c.Etcd.Connect()
 		//检查etcd上是否正常连接且是否存在同名Agent
 		c.Etcd.CheckConfigServer()
-		global.Logger.Println("已连接（", global.ConfigServer, "),开始监听配置<", global.AgentGroup, "|", global.AgentName, ">")
+		if global.EtcdOnline {
+			global.Logger.Printf("已连接（%s),开始监听配置<%s|%s>\n", global.ConfigServer, global.AgentGroup, global.AgentName)
+		}
 		//每个配置项监内部实现都用一个goroutine,所以要传wg
 		//监听Agent
 		c.Etcd.WatchConfig(global.Agent, &c.AgentConfi, &c.AgentConfi, wg)

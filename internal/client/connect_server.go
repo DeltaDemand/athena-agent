@@ -36,6 +36,7 @@ func (r *ReportServer) ConnectGRPC() error {
 		RefreshAgentState(true)
 		return err
 	}
+	global.Logger.Println("连接gPRC服务成功，dial的server端是：", r.GetAddr())
 	//连接成功就初始化pb.ReportServerClient池
 	clientPool = &sync.Pool{
 		New: func() interface{} {

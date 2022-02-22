@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/DeltaDemand/athena-agent/global"
 	"go.etcd.io/etcd/client/v3"
 	"strconv"
@@ -51,15 +50,25 @@ func (e *Etcd) CheckConfigServer() {
 	global.Logger.Printf("连接etcd成功")
 	//存在同名Agent
 	if response.Count != 0 {
-		fmt.Println(e.AgentGroup, "|", e.AgentName, "已存在配置系统(", global.ConfigServer, "),请重新输入AgentGroup：")
-		fmt.Scan(&e.AgentGroup)
-		fmt.Println("重新输入AgentName：")
-		fmt.Scan(&e.AgentName)
-		e.CheckConfigServer()
+		global.Logger.Printf("配置系统(%s)已存在%s|%s\n", global.ConfigServer, e.AgentGroup, e.AgentName)
+
+		////非docker的处理方式
+		//fmt.Println("重新输入AgentGroup：")
+		//fmt.Scan(&e.AgentGroup)
+		//fmt.Println("重新输入AgentName：")
+		//fmt.Scan(&e.AgentName)
+		//e.CheckConfigServer()
+
+		////docker的处理方式
+		global.Logger.Printf("etcd.Apply已设为false，不接入配置系统运行")
+		e.Apply = false
+		global.EtcdChange <- true
+		global.HandleChangeSuccess = false
+	} else {
+		global.AgentGroup = e.AgentGroup
+		global.AgentName = e.AgentName
+		global.EtcdOnline = true
 	}
-	global.AgentGroup = e.AgentGroup
-	global.AgentName = e.AgentName
-	global.EtcdOnline = true
 }
 
 // WatchConfig
