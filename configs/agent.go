@@ -17,6 +17,7 @@ type AgentConfs struct {
 //agent配置改变执行函数
 func (agent *AgentConfs) Execute(wg *sync.WaitGroup) error {
 	if agent.Exit {
+		client.DelAgent()
 		//检测到退出为真，直接Fatal退出
 		global.Logger.Fatal("Agent退出...")
 	}

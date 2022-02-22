@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/DeltaDemand/athena-agent/global"
 	"go.etcd.io/etcd/client/v3"
 	"strconv"
@@ -39,7 +40,7 @@ func (e *Etcd) Connect() error {
 }
 
 //检查etcd上是否正常连接，且不存在同名Agent
-func (e *Etcd) CheckConfigServer() bool {
+func (e *Etcd) CheckConfigServer() {
 	global.Logger.Printf("正在连接etcd...")
 	key := e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split
 	response, err := cli.Get(context.TODO(), key, clientv3.WithPrefix())
@@ -50,24 +51,29 @@ func (e *Etcd) CheckConfigServer() bool {
 	global.Logger.Printf("连接etcd成功")
 	//存在同名Agent
 	if response.Count != 0 {
-		return true
+		fmt.Println(e.AgentGroup, "|", e.AgentName, "已存在配置系统(", global.ConfigServer, "),请重新输入AgentGroup：")
+		fmt.Scan(&e.AgentGroup)
+		fmt.Println("重新输入AgentName：")
+		fmt.Scan(&e.AgentName)
+		e.CheckConfigServer()
 	}
-	return false
+	global.AgentGroup = e.AgentGroup
+	global.AgentName = e.AgentName
+	global.EtcdOnline = true
 }
 
 // WatchConfig
 //参数  ConfigChangeExecuter表示该配置更新是否要执行事件，nil表示不用
-func (e *Etcd) WatchConfig(exist bool, configName string, configs interface{}, obj ConfigChangeExecuter, wg *sync.WaitGroup) {
+func (e *Etcd) WatchConfig(configName string, configs interface{}, obj ConfigChangeExecuter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	//要监听的配置作为key
 	key := e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split + configName
-	if !exist {
-		//服务器不存在该agent配置。
-		//先上传一份配置到etcd服务器，相当于注册
-		value, _ := json.Marshal(configs)
-		//etcd没有就阻塞，不会往下运行，节约资源
-		cli.Put(context.TODO(), key, string(value))
-	}
+	//服务器不存在该agent配置。
+	//先上传一份配置到etcd服务器，相当于注册
+	value, _ := json.Marshal(configs)
+	//etcd没有就阻塞，不会往下运行，节约资源
+	cli.Put(context.TODO(), key, string(value))
+
 	go func() {
 		watchCh := cli.Watch(context.TODO(), key)
 		for res := range watchCh {
@@ -95,11 +101,27 @@ func (e *Etcd) WatchConfig(exist bool, configName string, configs interface{}, o
 	}()
 }
 
+func DelAgent() {
+	if global.EtcdOnline {
+		//如果已在云端再把云端配置删了
+		key := global.ConfigServer + global.Split + global.AgentGroup + global.Split + global.AgentName + global.Split
+		resp, _ := cli.Delete(context.TODO(), key, clientv3.WithPrefix())
+		if resp.Deleted > 0 {
+			global.Logger.Println("<", global.AgentGroup, "|", global.AgentName, ">云端配置删除成功")
+		} else {
+			global.Logger.Println("<", global.AgentGroup, "|", global.AgentName, ">删除失败，请云端是否存在配置")
+		}
+
+	}
+}
+
 // 更新配置后执行：重新连接etcd
 func (e *Etcd) Execute(wg *sync.WaitGroup) error {
 	//防止关闭连接后goroutine为零退出程序
 	wg.Add(1)
 	defer wg.Done()
+	//删除旧连接配置
+	DelAgent()
 	//释放旧连接
 	e.CloseConn()
 	global.AgentGroup = e.AgentGroup

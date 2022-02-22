@@ -24,6 +24,7 @@ var (
 	AgentGroup   string //本Agent所属etcd上的群组
 	AgentName    string ////本Agent在etcd上的名称
 
+	EtcdOnline          bool                 //etcd配置正常工作
 	EtcdChange          = make(chan bool, 1) //etcd有变，开始监听etcd
 	HandleChangeSuccess bool                 //etcd变化处理成功标识
 

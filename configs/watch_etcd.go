@@ -15,6 +15,7 @@ func (c *Config) RunEtcd(wg *sync.WaitGroup) {
 			global.HandleChangeSuccess = true
 			//不使用etcd直接打破循环，释放goroutine
 			if c.Etcd.Apply == false {
+				global.EtcdOnline = false
 				break
 			}
 		}
@@ -27,24 +28,24 @@ func (c *Config) StartWatchEtcd(wg *sync.WaitGroup) {
 	if c.Etcd.Apply {
 		//初始化连接etcd的参数
 		_ = c.Etcd.Connect()
-		//检查etcd上是否正常连接是否存在同名Agent
-		exist := c.Etcd.CheckConfigServer()
-
+		//检查etcd上是否正常连接且是否存在同名Agent
+		c.Etcd.CheckConfigServer()
+		global.Logger.Println("已连接（", global.ConfigServer, "),开始监听配置<", global.AgentGroup, "|", global.AgentName, ">")
 		//每个配置项监内部实现都用一个goroutine,所以要传wg
 		//监听Agent
-		c.Etcd.WatchConfig(exist, global.Agent, &c.AgentConfi, &c.AgentConfi, wg)
+		c.Etcd.WatchConfig(global.Agent, &c.AgentConfi, &c.AgentConfi, wg)
 
 		//监听ReportServer
-		c.Etcd.WatchConfig(exist, global.ReportServer, &c.ReportServer, &c.ReportServer, wg)
+		c.Etcd.WatchConfig(global.ReportServer, &c.ReportServer, &c.ReportServer, wg)
 
 		//监听Etcd
-		c.Etcd.WatchConfig(exist, global.Etcd, &c.Etcd, &c.Etcd, wg)
+		c.Etcd.WatchConfig(global.Etcd, &c.Etcd, &c.Etcd, wg)
 
 		//监听全局的指标
 		for _, metric := range global.Metrics {
 			//每个指标的采样器
 			sam := metric.(sampler.Sampler)
-			c.Etcd.WatchConfig(exist, sam.GetMetricName(), sam.GetConfigPtr(), sam, wg)
+			c.Etcd.WatchConfig(sam.GetMetricName(), sam.GetConfigPtr(), sam, wg)
 		}
 	}
 

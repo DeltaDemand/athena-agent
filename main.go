@@ -1,17 +1,22 @@
 package main
 
 import (
+	"fmt"
 	appConfigs "github.com/DeltaDemand/athena-agent/configs"
 	"github.com/DeltaDemand/athena-agent/global"
 	"github.com/DeltaDemand/athena-agent/internal/client"
 	"github.com/DeltaDemand/athena-agent/internal/inputArgs"
 	"github.com/DeltaDemand/athena-agent/internal/sampler"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 )
 
 var wg sync.WaitGroup
 
 func main() {
+	go exitHandle()
 	//加载configs/config.json下配置
 	confs := appConfigs.LoadingConfigs()
 	//检测用户输入配置
@@ -37,4 +42,20 @@ func main() {
 	}
 	wg.Wait()
 	global.Logger.Println("无采样器在运行，Agent退出...")
+}
+func exitHandle() {
+	exitChan := make(chan os.Signal)
+	signal.Notify(exitChan, os.Interrupt, os.Kill, syscall.SIGTERM)
+	for {
+		select {
+		case sig := <-exitChan:
+			fmt.Println("接受到来自系统的信号：", sig)
+			if global.EtcdOnline {
+				//退出把云端配置删了
+				client.DelAgent()
+			}
+			os.Exit(1) //如果ctrl+c 关不掉程序，使用os.Exit强行关掉
+		}
+	}
+
 }
