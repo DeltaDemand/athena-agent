@@ -41,6 +41,8 @@ func main() {
 		metric.(sampler.Sampler).Execute(&wg)
 	}
 	wg.Wait()
+	//退出把云端配置删了
+	client.DelAgent()
 	global.Logger.Println("无采样器在运行，Agent退出...")
 }
 
@@ -52,10 +54,8 @@ func exitHandle() {
 		select {
 		case sig := <-exitChan:
 			fmt.Println("接受到来自系统的信号：", sig)
-			if global.EtcdOnline {
-				//退出把云端配置删了
-				client.DelAgent()
-			}
+			//退出把云端配置删了
+			client.DelAgent()
 			os.Exit(1) //如果ctrl+c 关不掉程序，使用os.Exit强行关掉
 		}
 	}
