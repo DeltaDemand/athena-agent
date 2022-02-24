@@ -42,8 +42,8 @@ func main() {
 	}
 	wg.Wait()
 	//退出把云端配置删了
-	client.DelAgent()
 	global.Logger.Println("无采样器在运行，Agent退出...")
+	client.DelAgent()
 }
 
 func exitHandle() {
