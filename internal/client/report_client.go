@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	sendErrorTimes = 0 //连续失败次数
 	// 保证正在调用client时,不会突然改变连接参数
 	// 保证改变参数重连时，不会有goroutine调用client
 	connSafe sync.RWMutex
@@ -65,9 +66,18 @@ func RequestToServer(req pb.ReportReq) (*pb.ReportRsp, error) {
 	connSafe.RUnlock()
 	if err != nil {
 		global.Logger.Printf("gPRC服务发送信息失败\n", err)
-		//处理发送直接返回
+		sendErrorTimes++
+		if sendErrorTimes > global.SendErrorLimit {
+			global.Logger.Printf("发送失败超过%d次，暂停Agent...", global.SendErrorLimit)
+			//gRPC连接失败次数过多，Agent暂停
+			global.SetPause(true)
+			//把Agent状态更新configServer上的状态
+			RefreshAgentState(true)
+			sendErrorTimes = 0
+		}
 		return nil, err
 	}
+	sendErrorTimes = 0
 	global.Logger.Printf("Metric: [%s],Value:[%f],\t Request resp  {code: %d, message: %s}\n", req.Metric, req.Value, rep.Code, rep.Msg)
 	//ReportServer找不到本机uid，重新注册
 	if rep.Code == notFoundCode {

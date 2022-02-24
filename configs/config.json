@@ -1,9 +1,10 @@
 {
     "Agent": {
+        "send_error_limit": 10,
         "pause": false
     },
     "ReportServer":{
-        "checkAlive":120,
+        "check_alive":120,
         "ip":"athena-server",
         "port": "8888"
     },
@@ -12,27 +13,27 @@
         "config_server": "config-s01",
         "agent_group": "g01",
         "agent_name": "A01",
-        "endPoints": ["112.74.60.132:2379"],
-        "dialTimeout": 5
+        "end_points": ["112.74.60.132:2379"],
+        "dial_timeout": 5
     },
     "cpu_rate": {
         "run": true,
-        "reportInterval": 60
+        "report_interval": 60
     },
     "memory_used": {
         "run": true,
-        "samplingInterval": 1,
-        "reportInterval": 60
+        "sampling_interval": 1,
+        "report_interval": 60
     },
     "disk_used": {
         "run": true,
-        "reportInterval": 60
+        "report_interval": 60
     },
     "cpu_mem": {
         "run": true,
-        "samplingInterval": 1,
-        "reportInterval": 60,
-        "cpuPercentThreshold": 70.0,
-        "memPercentThreshold": 50.0
+        "sampling_interval": 1,
+        "report_interval": 60,
+        "cpu_percent_threshold": 70.0,
+        "mem_percent_threshold": 50.0
     }
 }

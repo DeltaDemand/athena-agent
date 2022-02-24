@@ -43,4 +43,5 @@ func Parse(confs *appConfigs.Config) {
 	global.CheckAlive = confs.ReportServer.CheckAlive
 	global.AgentGroup = confs.Etcd.AgentGroup
 	global.AgentName = confs.Etcd.AgentName
+	global.SendErrorLimit = confs.AgentConfi.SendErrorLimit
 }

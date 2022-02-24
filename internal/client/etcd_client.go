@@ -15,8 +15,8 @@ type Etcd struct {
 	AgentGroup   string   `json:"agent_group"`
 	AgentName    string   `json:"agent_name"`
 	Apply        bool     `json:"apply"`
-	EndPoints    []string `json:"endPoints"`
-	DialTimeout  int      `json:"dialTimeout"`
+	EndPoints    []string `json:"end_points"`
+	DialTimeout  int      `json:"dial_timeout"`
 }
 
 var (

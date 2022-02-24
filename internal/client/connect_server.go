@@ -11,7 +11,7 @@ import (
 )
 
 type ReportServer struct {
-	CheckAlive int    `json:"checkAlive"` //给ReportServer的检查本agent存活的时间阈值
+	CheckAlive int    `json:"check_alive"` //给ReportServer的检查本agent存活的时间阈值
 	Ip         string `json:"ip"`
 	Port       string `json:"port"`
 }

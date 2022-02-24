@@ -9,8 +9,9 @@ import (
 
 //本agent的一些参数
 type AgentConfs struct {
-	Pause bool `json:"pause"`
-	Exit  bool `json:"exit"`
+	SendErrorLimit int  `json:"send_error_limit"`
+	Pause          bool `json:"pause"`
+	Exit           bool `json:"exit"`
 }
 
 //agent配置改变执行函数
@@ -20,6 +21,7 @@ func (agent *AgentConfs) Execute(wg *sync.WaitGroup) error {
 		//检测到退出为真，直接Fatal退出
 		global.Logger.Fatal("Agent退出...")
 	}
+	global.SendErrorLimit = agent.SendErrorLimit
 	global.SetPause(agent.Pause)
 	//如果读到非暂停，将暂停的采样器执行起来
 	if !global.GetPause() {
