@@ -60,7 +60,7 @@ func (s *MemSample) sendMemPercent() {
 		if samplingInterval == 0 {
 			//采集时间间隔到了，采集数据
 			memInfo, err := mem.VirtualMemory()
-			if err == nil {
+			if err == nil && memInfo.UsedPercent != 0 {
 				samplingResult += memInfo.UsedPercent
 				samplingTimes++
 			}
