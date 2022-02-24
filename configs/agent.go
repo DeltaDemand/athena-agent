@@ -9,9 +9,8 @@ import (
 
 //本agent的一些参数
 type AgentConfs struct {
-	CheckAlive int  `json:"checkAlive"` //给ReportServer的检查本agent存活的时间阈值
-	Pause      bool `json:"pause"`
-	Exit       bool `json:"exit"`
+	Pause bool `json:"pause"`
+	Exit  bool `json:"exit"`
 }
 
 //agent配置改变执行函数

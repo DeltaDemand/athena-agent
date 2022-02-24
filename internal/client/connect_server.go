@@ -11,8 +11,9 @@ import (
 )
 
 type ReportServer struct {
-	Ip   string `json:"ip"`
-	Port string `json:"port"`
+	CheckAlive int    `json:"checkAlive"` //给ReportServer的检查本agent存活的时间阈值
+	Ip         string `json:"ip"`
+	Port       string `json:"port"`
 }
 
 var (
@@ -56,6 +57,7 @@ func (r *ReportServer) Execute(wg *sync.WaitGroup) error {
 	if err != nil {
 		return err
 	}
+	global.CheckAlive = r.CheckAlive
 	err = Register()
 	if err != nil {
 		return err

@@ -10,8 +10,8 @@ import (
 // Parse :Agent命令行参数解析
 func Parse(confs *appConfigs.Config) {
 
-	flag.IntVar(&confs.AgentConfi.CheckAlive, "checkAlive", confs.AgentConfi.CheckAlive, "检测是否存活时间间隔")
 	flag.Int64Var(&global.AggregationTime, "aggregationTime", 0, "上报几次进行聚合，默认0(由server端决定)")
+	flag.IntVar(&confs.ReportServer.CheckAlive, "checkAlive", confs.ReportServer.CheckAlive, "检测是否存活时间间隔")
 	flag.StringVar(&confs.ReportServer.Ip, "ip", confs.ReportServer.Ip, "监控服务器ip地址")
 	flag.StringVar(&confs.ReportServer.Port, "p", confs.ReportServer.Port, "监控服务器监听端口号")
 
@@ -40,7 +40,7 @@ func Parse(confs *appConfigs.Config) {
 	//初始化全局变量值
 	confs.Etcd.EndPoints = strings.Split(ends, ",")
 	global.ConfigServer = confs.Etcd.ConfigServer
-	global.CheckAlive = confs.AgentConfi.CheckAlive
+	global.CheckAlive = confs.ReportServer.CheckAlive
 	global.AgentGroup = confs.Etcd.AgentGroup
 	global.AgentName = confs.Etcd.AgentName
 }

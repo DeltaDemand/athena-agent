@@ -1,9 +1,9 @@
 {
     "Agent": {
-        "checkAlive":120,
         "pause": false
     },
     "ReportServer":{
+        "checkAlive":120,
         "ip":"athena-server",
         "port": "8888"
     },
