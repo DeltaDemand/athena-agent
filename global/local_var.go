@@ -11,7 +11,7 @@ import (
 var (
 	ip              string
 	uId             string //本Agent唯一id
-	Split           = "(]" //用于监控etcd连接 AgentGroup、AgentName、配置项的字符串
+	Split           = "/"  //用于监控etcd连接 AgentGroup、AgentName、配置项的字符串
 	SendErrorLimit  int    //连续发送失败次数尝试
 	CheckAlive      int    //本Agent可能最长多长时间不上报
 	AggregationTime int64  //上报几次进行聚合
@@ -84,6 +84,7 @@ func initIP() (err error) {
 }
 
 func InitVar() {
+	Logger.SetPrefix("<" + AgentGroup + "|" + AgentName + ">")
 	initIP()
 	EtcdChange <- true
 }

@@ -41,7 +41,7 @@ func (e *Etcd) Connect() error {
 //检查etcd上是否正常连接，且不存在同名Agent
 func (e *Etcd) CheckConfigServer() {
 	global.Logger.Printf("正在连接etcd...")
-	key := e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split
+	key := global.Split + e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split
 	response, err := cli.Get(context.TODO(), key, clientv3.WithPrefix())
 	//检查etcd上是否正常连接
 	if err != nil {
@@ -62,6 +62,7 @@ func (e *Etcd) CheckConfigServer() {
 		////docker的处理方式
 		global.Logger.Printf("etcd.Apply已设为false，不接入配置系统运行")
 		e.Apply = false
+		global.EtcdOnline = false
 		global.EtcdChange <- true
 		global.HandleChangeSuccess = false
 	} else {
@@ -76,7 +77,7 @@ func (e *Etcd) CheckConfigServer() {
 func (e *Etcd) WatchConfig(configName string, configs interface{}, obj ConfigChangeExecuter, wg *sync.WaitGroup) {
 	wg.Add(1)
 	//要监听的配置作为key
-	key := e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split + configName
+	key := global.Split + e.ConfigServer + global.Split + e.AgentGroup + global.Split + e.AgentName + global.Split + configName
 	//服务器不存在该agent配置。
 	//先上传一份配置到etcd服务器，相当于注册
 	value, _ := json.Marshal(configs)
@@ -96,14 +97,14 @@ func (e *Etcd) WatchConfig(configName string, configs interface{}, obj ConfigCha
 				err := obj.Execute(wg)
 				//执行失败
 				if err != nil {
-					global.Logger.Printf("%s Configs change to %#v, fail to Execute", configName, configs)
+					global.Logger.Printf("%s Configs change to %v, fail to Execute", configName, configs)
 				} else {
 					//执行成功
-					global.Logger.Printf("%s Configs change to %#v,change Execute", configName, configs)
+					global.Logger.Printf("%s Configs change to %v,change Execute", configName, configs)
 				}
 			} else {
 				//不需要执行事件直接打印结构体
-				global.Logger.Printf("%s Configs change to %#v", configName, configs)
+				global.Logger.Printf("%s Configs change to %v", configName, configs)
 			}
 		}
 		wg.Done()
@@ -113,7 +114,7 @@ func (e *Etcd) WatchConfig(configName string, configs interface{}, obj ConfigCha
 func DelAgent() {
 	if global.EtcdOnline {
 		//如果已在云端再把云端配置删了
-		key := global.ConfigServer + global.Split + global.AgentGroup + global.Split + global.AgentName + global.Split
+		key := global.Split + global.ConfigServer + global.Split + global.AgentGroup + global.Split + global.AgentName
 		resp, _ := cli.Delete(context.TODO(), key, clientv3.WithPrefix())
 		if resp.Deleted > 0 {
 			global.Logger.Println("<", global.AgentGroup, "|", global.AgentName, ">云端配置删除成功")
@@ -135,6 +136,7 @@ func (e *Etcd) Execute(wg *sync.WaitGroup) error {
 	e.CloseConn()
 	global.AgentGroup = e.AgentGroup
 	global.AgentName = e.AgentName
+	global.Logger.SetPrefix("<" + e.AgentGroup + "|" + e.AgentName + ">")
 	//Apply==true就重连
 	if e.Apply {
 		//设置etcd变化和没成功处理此次变化，再次连接

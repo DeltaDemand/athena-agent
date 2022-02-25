@@ -32,22 +32,22 @@ func (c *Config) StartWatchEtcd(wg *sync.WaitGroup) {
 		c.Etcd.CheckConfigServer()
 		if global.EtcdOnline {
 			global.Logger.Printf("已连接（%s),开始监听配置<%s|%s>\n", global.ConfigServer, global.AgentGroup, global.AgentName)
-		}
-		//每个配置项监内部实现都用一个goroutine,所以要传wg
-		//监听Agent
-		c.Etcd.WatchConfig(global.Agent, &c.AgentConfi, &c.AgentConfi, wg)
+			//每个配置项监内部实现都用一个goroutine,所以要传wg
+			//监听Agent
+			c.Etcd.WatchConfig(global.Agent, &c.AgentConfi, &c.AgentConfi, wg)
 
-		//监听ReportServer
-		c.Etcd.WatchConfig(global.ReportServer, &c.ReportServer, &c.ReportServer, wg)
+			//监听ReportServer
+			c.Etcd.WatchConfig(global.ReportServer, &c.ReportServer, &c.ReportServer, wg)
 
-		//监听Etcd
-		c.Etcd.WatchConfig(global.Etcd, &c.Etcd, &c.Etcd, wg)
+			//监听Etcd
+			c.Etcd.WatchConfig(global.Etcd, &c.Etcd, &c.Etcd, wg)
 
-		//监听全局的指标
-		for _, metric := range global.Metrics {
-			//每个指标的采样器
-			sam := metric.(sampler.Sampler)
-			c.Etcd.WatchConfig(sam.GetMetricName(), sam.GetConfigPtr(), sam, wg)
+			//监听全局的指标
+			for _, metric := range global.Metrics {
+				//每个指标的采样器
+				sam := metric.(sampler.Sampler)
+				c.Etcd.WatchConfig(sam.GetMetricName(), sam.GetConfigPtr(), sam, wg)
+			}
 		}
 	}
 
